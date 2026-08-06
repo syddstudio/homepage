@@ -145,8 +145,8 @@
     margin-bottom: 6px;
   }
   .card .icon img { width: 100%; height: 100%; display: block; }
-  /* 풀블리드 사각형(Android 스토어 아이콘)만 라운딩 + macOS 스쿼클의 내부 여백만큼 축소 보정 */
-  .card .icon img.rounded { width: 41px; height: 41px; border-radius: 9.5px; }
+  /* 풀블리드 사각형(Android 스토어 아이콘)만 라운딩 + macOS 스쿼클의 내부 여백(콘텐츠 ~80%)에 맞춰 축소 */
+  .card .icon img.rounded { width: 38px; height: 38px; border-radius: 8.5px; }
   .card h3 { font-size: 0.98rem; font-weight: 400; }
   .card p { color: var(--muted); font-size: 0.93rem; flex: 1; }
   .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -246,7 +246,7 @@
         <p>A floating sticky note for your Google Tasks. Your to-do list, always one glance away on your Mac desktop.</p>
         <div class="card-meta">
           <span class="tag tag-mac">macOS</span>
-          <span class="tag tag-soon">Coming soon</span>
+          <span class="tag tag-soon">Mac App Store — coming soon</span>
         </div>
       </a>
     </div>
