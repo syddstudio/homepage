@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 제목과 h1은 OAuth 동의 화면의 앱 이름과 글자 그대로 같아야 한다.
+     구글 브랜드 검증이 "홈페이지의 앱 이름과 일치하지 않는다"로 반려한 적이 있다. -->
+<title>Sticky for Google Tasks — always-on-top task window for macOS</title>
+<meta name="description" content="A small always-on-top window that keeps your Google Tasks in the corner of your Mac screen. Made by SYDD Studio.">
+<meta property="og:title" content="Sticky for Google Tasks">
+<meta property="og:description" content="Your Google Tasks, always in the corner of your screen.">
+<meta property="og:url" content="https://syddstudio.com/apps/sticky-for-google-tasks/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://syddstudio.com/img/logo.png">
+<link rel="canonical" href="https://syddstudio.com/apps/sticky-for-google-tasks/">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<style>
+  /* 루트 index.html과 같은 토큰·폰트. 하위 경로라 파일 참조만 절대경로다. */
+  @font-face {
+    font-family: "Geist";
+    src: url("/fonts/Geist-Variable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Galmuri11";
+    src: url("/fonts/Galmuri11.woff2") format("woff2");
+    font-display: swap;
+  }
+  :root {
+    color-scheme: dark;
+    --bg: #0b101e;
+    --bg2: #0e1424;
+    --fg: #eef0f6;
+    --muted: #9aa2b8;
+    --faint: #5d6478;
+    --line: rgba(255, 255, 255, 0.10);
+    --card: #111a2e;
+    --gold: #f6c445;
+    --purple: #8b7ff0;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .pixel { font-family: "Galmuri11", "Geist", sans-serif; letter-spacing: 0; }
+  .stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 18%, #ffffff 50%, transparent 51%),
+      radial-gradient(1px 1px at 34% 62%, #cfe3ff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 58% 8%, #ffe9a8 50%, transparent 51%),
+      radial-gradient(1px 1px at 71% 41%, #ffffff 50%, transparent 51%),
+      radial-gradient(1px 1px at 88% 24%, #cfe3ff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 45% 86%, #ffffff 50%, transparent 51%),
+      radial-gradient(1px 1px at 6% 78%, #ffe9a8 50%, transparent 51%),
+      radial-gradient(1px 1px at 93% 69%, #ffffff 50%, transparent 51%);
+    background-size: 900px 700px;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  nav { display: flex; align-items: center; padding: 26px 0; }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; white-space: nowrap; }
+  .logo img { width: 38px; height: 38px; display: block; }
+  .wordmark { display: flex; flex-direction: column; gap: 3px; }
+  .wordmark .wm-top {
+    font-family: "Galmuri11", "Geist", sans-serif;
+    color: var(--gold); font-size: 1.02rem; line-height: 1;
+    letter-spacing: 0.06em; text-shadow: 0 1px 0 rgba(224, 154, 47, 0.55);
+  }
+  .wordmark .wm-bottom {
+    color: var(--muted); font-size: 0.58rem; line-height: 1;
+    letter-spacing: 0.42em; font-weight: 600; text-transform: uppercase;
+  }
+
+  .hero { padding: 56px 0 8px; display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+  .app-icon {
+    width: 84px; height: 84px; border-radius: 19px; flex: none;
+    background: linear-gradient(160deg, #4d8ff0, #1660c9);
+    position: relative; overflow: hidden;
+    box-shadow: 0 14px 34px rgba(22, 96, 201, 0.35);
+  }
+  .app-icon .back {
+    position: absolute; left: 25.5px; top: 17px; width: 43.5px; height: 33px;
+    border-radius: 7.5px; background: rgba(255, 255, 255, 0.32);
+  }
+  .app-icon .front {
+    position: absolute; left: 17px; top: 27.5px; width: 49.5px; height: 36.5px;
+    border-radius: 9px; background: #fff;
+    box-shadow: 0 3px 9px rgba(13, 48, 105, 0.3);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .app-icon .front svg { width: 34px; height: 34px; }
+
+  h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); line-height: 1.25; font-weight: 400; }
+  .tagline { margin-top: 14px; color: var(--muted); font-size: 1.04rem; max-width: 54ch; }
+  .meta { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag {
+    font-size: 0.76rem; padding: 4px 10px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted);
+  }
+  .tag-mac { color: var(--purple); border-color: rgba(139, 127, 240, 0.35); }
+  .tag-soon { color: var(--gold); border-color: rgba(246, 196, 69, 0.3); }
+
+  section { padding: 56px 0 0; }
+  .kicker { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 12px; text-transform: uppercase; }
+  h2 { font-size: clamp(1.15rem, 2.4vw, 1.5rem); font-weight: 400; line-height: 1.4; margin-bottom: 24px; }
+
+  .features { list-style: none; padding: 0; display: grid; gap: 14px; }
+  .features li {
+    border: 1px solid var(--line); border-radius: 12px; background: var(--card);
+    padding: 18px 20px; color: var(--muted); font-size: 0.95rem;
+  }
+  .features strong { color: var(--fg); font-weight: 550; }
+
+  .note { color: var(--muted); font-size: 0.95rem; max-width: 62ch; }
+  .note + .note { margin-top: 14px; }
+  a { color: var(--gold); }
+  a:hover { color: #ffd35e; }
+  .req { margin-top: 18px; color: var(--faint); font-size: 0.86rem; }
+
+  footer { margin-top: 88px; border-top: 1px solid var(--line); padding: 40px 0 56px; }
+  .foot-links { display: flex; gap: 24px; margin-bottom: 28px; flex-wrap: wrap; }
+  .foot-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; }
+  .foot-links a:hover { color: var(--gold); }
+  .biz { color: var(--faint); font-size: 0.8rem; line-height: 1.9; }
+  .biz .sep { margin: 0 8px; opacity: 0.5; }
+  .biz a { color: var(--faint); text-decoration: none; }
+  .biz a:hover { color: var(--muted); }
+  .copy { margin-top: 20px; color: var(--faint); font-size: 0.8rem; }
+  .fine { margin-top: 14px; color: var(--faint); font-size: 0.8rem; max-width: 70ch; }
+</style>
+</head>
+<body>
+<div class="stars" aria-hidden="true"></div>
+<div class="container">
+
+  <nav>
+    <a class="logo" href="/">
+      <img src="/img/logo.png" alt="" onerror="this.style.display='none'">
+      <span class="wordmark" aria-label="SYDD Studio">
+        <span class="wm-top">SYDD</span>
+        <span class="wm-bottom">Studio</span>
+      </span>
+    </a>
+  </nav>
+
+  <header class="hero">
+    <div class="app-icon" aria-hidden="true">
+      <span class="back"></span>
+      <span class="front">
+        <svg viewBox="0 0 100 100" fill="none" stroke="#1a73e8" stroke-width="10"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="28 52 44 68 74 34" />
+        </svg>
+      </span>
+    </div>
+    <div>
+      <h1 class="pixel">Sticky for Google Tasks</h1>
+      <p class="tagline">
+        Your Google Tasks, always in the corner of your screen. A small translucent window for
+        macOS that stays on top of whatever you are working on.
+      </p>
+      <div class="meta">
+        <span class="tag tag-mac">macOS</span>
+        <span class="tag tag-soon">Mac App Store — coming soon</span>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="kicker pixel">WHAT IT DOES</div>
+    <h2 class="pixel">A task list that never gets buried</h2>
+    <ul class="features">
+      <li><strong>Always on top.</strong> The window floats above other apps so your list is visible while you work. Adjustable opacity, and it fades in when you point at it.</li>
+      <li><strong>Your real Google Tasks.</strong> Signs in with your Google account and syncs both ways with tasks.google.com, Gmail, and the mobile app.</li>
+      <li><strong>Full editing.</strong> Add, rename, reorder, indent into subtasks, add details, complete, and delete — all inline, with undo.</li>
+      <li><strong>Restore deleted tasks.</strong> Deleted tasks are hidden in Google's own apps. This one can show them and bring them back.</li>
+      <li><strong>Stays out of the way.</strong> Lives in the menu bar, not the Dock. Collapses to a small circle when you need the space.</li>
+    </ul>
+    <p class="req">Requires macOS 12 or later · Apple Silicon</p>
+  </section>
+
+  <section>
+    <div class="kicker pixel">GOOGLE ACCOUNT ACCESS</div>
+    <h2 class="pixel">Why the app asks to connect</h2>
+    <p class="note">
+      Sticky is a desktop window onto the task list you already keep in Google Tasks. To show and
+      edit that list, it asks for one permission — the Google Tasks scope
+      (<code>https://www.googleapis.com/auth/tasks</code>) — and uses it only to read and write your
+      task lists and tasks inside the app's own window.
+    </p>
+    <p class="note">
+      You sign in through your system web browser using Google's standard OAuth flow, so the app
+      never sees your password. Requests go straight from your Mac to Google's Tasks API. There is
+      no SYDD Studio server, no analytics, and no third party — the developer cannot see your tasks
+      or your account. Full details are in the
+      <a href="https://privacy.syddstudio.com/apps/sticky-for-google-tasks/">Privacy Policy</a>.
+    </p>
+  </section>
+
+  <section>
+    <div class="kicker pixel">SUPPORT</div>
+    <h2 class="pixel">Found a bug, or want something added?</h2>
+    <p class="note">
+      Email <a href="mailto:support@syddstudio.com">support@syddstudio.com</a>. Every message is
+      read by the developer.
+    </p>
+  </section>
+
+  <footer>
+    <div class="foot-links">
+      <a href="/">SYDD Studio</a>
+      <a href="https://privacy.syddstudio.com/apps/sticky-for-google-tasks/">Privacy policy</a>
+      <a href="mailto:support@syddstudio.com">Contact</a>
+    </div>
+    <p class="fine">
+      Sticky for Google Tasks is an independent app made by SYDD Studio. It is not affiliated with,
+      endorsed by, or sponsored by Google LLC. Google Tasks™ is a trademark of Google LLC.
+    </p>
+    <div class="copy">© 2026 SYDD Studio. All rights reserved.</div>
+  </footer>
+
+</div>
+</body>
+</html>
