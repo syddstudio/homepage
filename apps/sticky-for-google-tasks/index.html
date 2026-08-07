@@ -65,7 +65,10 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.86em
         <img src="/img/apps/sticky.png" alt="" style="position:relative; width:96px; height:96px; display:block; filter:drop-shadow(0 14px 34px rgba(22,96,201,0.4));">
       </div>
       <div style="flex:1; min-width:280px;">
-        <h1 style="font-family:'Galmuri11','Geist',sans-serif; font-size:clamp(1.6rem,4vw,2.3rem); line-height:1.25; font-weight:400; margin:0;">Sticky for Google Tasks</h1>
+        <!-- h1만 일반 폰트다 — 지우지 말 것. 브랜드 검증이 스크린샷+OCR로 앱 이름을
+     대조할 가능성에 대비해, 이름이 걸린 h1은 픽셀 폰트(Galmuri11)를 쓰지 않는다.
+     이름 매칭과 무관한 킥커·h2·워드마크는 픽셀 폰트 유지. -->
+        <h1 style="font-family:'Geist',-apple-system,sans-serif; font-size:clamp(1.6rem,4vw,2.3rem); line-height:1.25; font-weight:650; letter-spacing:-0.01em; margin:0;">Sticky for Google Tasks</h1>
         <p style="margin:16px 0 0; color:#9aa2b8; font-size:1.06rem; max-width:54ch;">Your Google Tasks, always in the corner of your screen. A small translucent window for macOS that stays on top of whatever you are working on.</p>
         <div style="margin-top:20px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
           <span style="font-size:0.72rem; padding:4px 10px; border-radius:6px; background:rgba(139,127,240,0.14); color:#a99fff; font-weight:500;">macOS</span>
