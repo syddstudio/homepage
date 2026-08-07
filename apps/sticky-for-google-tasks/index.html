@@ -124,36 +124,11 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.86em
 
   </div>
 </div>
-<script>
-(function () {
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  var targets = document.querySelectorAll("section, footer");
-  targets.forEach(function (el) {
-    el.style.opacity = "0";
-    el.style.transform = "translateY(16px)";
-    el.style.transition = "opacity .7s ease, transform .7s ease";
-  });
-  var reveal = function (el) {
-    el.style.opacity = "1";
-    el.style.transform = "none";
-  };
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      reveal(e.target);
-      io.unobserve(e.target);
-    });
-  }, { threshold: 0.1 });
-  targets.forEach(function (el) { io.observe(el); });
-
-  // ⚠ 안전망 — 지우지 말 것.
-  // 이 효과는 스크롤해야 내용이 드러난다. 사람은 스크롤하지만 "JS는 실행하되
-  // 스크롤은 하지 않는" 렌더러(검색 크롤러, 심사 봇, 미리보기 생성기)에는 첫
-  // 화면 아래 절이 투명한 채로 남는다. 이 페이지는 아래쪽에 앱의 목적과 요청
-  // 스코프 설명이 있어서, 그게 안 보이면 Google 브랜드 검증이 "홈페이지에 앱의
-  // 목적에 관한 설명이 없습니다"로 반려한다.
-  setTimeout(function () { targets.forEach(reveal); }, 1200);
-})();
-</script>
+<!-- 이 페이지에는 스크롤 리빌 애니메이션을 넣지 않는다 — 지우지 말고 이유를 읽을 것.
+     Google OAuth 브랜드 검증이 이 URL을 심사한다. JS로 opacity:0을 걸고 나중에
+     되살리는 방식은 "스냅샷을 언제 찍느냐"에 따라 봇에게 빈 페이지로 보인다.
+     1.2초 타이머 안전망으로도 그보다 일찍 찍는 봇은 못 막는다. 검증이 걸린
+     페이지에서는 어떤 시점에 렌더링해도 전부 보이는 것이 애니메이션보다 중요하다.
+     (랜딩 index.html의 리빌 효과는 유지 — 거긴 검증 대상이 아니다.) -->
 </body>
 </html>
