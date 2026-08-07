@@ -180,15 +180,25 @@ a:hover { color:#ffd35e; }
     el.style.transform = "translateY(16px)";
     el.style.transition = "opacity .7s ease, transform .7s ease";
   });
+  var reveal = function (el) {
+    el.style.opacity = "1";
+    el.style.transform = "none";
+  };
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
       if (!e.isIntersecting) return;
-      e.target.style.opacity = "1";
-      e.target.style.transform = "none";
+      reveal(e.target);
       io.unobserve(e.target);
     });
   }, { threshold: 0.12 });
   targets.forEach(function (el) { io.observe(el); });
+
+  // ⚠ 안전망 — 지우지 말 것. (앱 페이지에도 같은 것이 있다)
+  // 스크롤해야 드러나는 효과라, "JS는 실행하되 스크롤은 하지 않는" 렌더러
+  // (검색 크롤러, 심사 봇, 미리보기 생성기)에는 본문이 투명한 채로 남는다.
+  // 창을 실제로 띄우지 않는 환경에서는 IntersectionObserver가 아예 발동하지
+  // 않아 첫 화면 안의 요소까지 안 보인다 — 실측으로 확인했다.
+  setTimeout(function () { targets.forEach(reveal); }, 1200);
 })();
 </script>
 </body>
