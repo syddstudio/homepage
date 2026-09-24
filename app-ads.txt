@@ -1,4 +1,1 @@
-# pub-1652553714898290: 신 계정, code 15부터
 google.com, pub-1652553714898290, DIRECT, f08c47fec0942fa0
-# pub-1012501906200833: 구 계정, code 14 이하 설치분 사용 중 — 삭제 전 내부 문서 확인
-google.com, pub-1012501906200833, DIRECT, f08c47fec0942fa0
