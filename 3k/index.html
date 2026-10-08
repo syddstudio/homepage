@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>삼국천하 - 한중일 대전략 | SYDD Studio</title>
+<meta name="robots" content="noindex">
+<script>
+// One-link for profiles (Instagram, YouTube): Android -> Play, iPhone/iPad -> App Store, else stay on this page.
+// ?s=<source> carries the channel into Play install referrer and App Store ct. No cookies, no trackers.
+var PLAY = "https://play.google.com/store/apps/details?id=com.syddstudio.threerealms";
+var APPSTORE = "https://apps.apple.com/kr/app/id6816171615";
+function storeLinks(search) {
+  var m = /[?&]s=([^&#]*)/.exec(search || "");
+  var s = m ? m[1].toLowerCase() : "";
+  if (!/^[a-z0-9_-]{1,32}$/.test(s)) s = "";
+  return {
+    play: s ? PLAY + "&referrer=" + encodeURIComponent("utm_source=" + s + "&utm_campaign=profile") : PLAY,
+    ios: s ? APPSTORE + "?ct=" + s : APPSTORE
+  };
+}
+function pickStore(ua, touchPoints) {
+  if (/Android/i.test(ua)) return "play";
+  if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1)) return "ios";
+  return "";
+}
+try {
+  var L = storeLinks(location.search);
+  var P = pickStore(navigator.userAgent || "", navigator.maxTouchPoints || 0);
+  if (P) location.replace(L[P]);
+} catch (e) {}
+</script>
+<meta name="description" content="이순신 vs 조조 vs 노부나가. 한중일 영웅이 한 지도에서 천하를 다투는 턴제 전략 게임. 무료.">
+<meta property="og:title" content="삼국천하 - 한중일 대전략">
+<meta property="og:description" content="이순신 vs 조조 vs 노부나가. 무료.">
+<meta property="og:url" content="https://syddstudio.com/3k/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://syddstudio.com/img/apps/three-realms.jpg">
+<link rel="icon" type="image/png" href="../img/favicon.png">
+<style>
+@font-face { font-family:"Geist"; src:url("../fonts/Geist-Variable.woff2") format("woff2"); font-weight:100 900; font-display:swap; }
+@font-face { font-family:"Galmuri11"; src:url("../fonts/Galmuri11.woff2") format("woff2"); font-display:swap; }
+* { box-sizing:border-box; }
+body { margin:0; background:#080d19; color:#eef0f6; font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; }
+a { color:#f6c445; text-decoration:none; }
+.wrap { max-width:420px; margin:0 auto; padding:56px 16px 40px; text-align:center; }
+.icon { width:128px; height:128px; border-radius:28px; box-shadow:0 10px 40px rgba(0,0,0,0.5); }
+h1 { font-family:"Galmuri11","Geist",sans-serif; font-weight:400; font-size:1.5rem; line-height:1.4; margin:24px 0 6px; }
+.sub { color:#9aa2b8; margin:0; }
+.btns { display:flex; flex-direction:column; gap:12px; margin:32px 0 0; }
+.cta { display:block; padding:14px 20px; border-radius:999px; background:#f6c445; color:#17120a; font-weight:600; }
+.cta.alt { background:transparent; color:#eef0f6; border:1px solid rgba(255,255,255,0.18); }
+.cta:hover { opacity:0.9; }
+.small { color:#5d6478; font-size:0.82rem; margin-top:40px; }
+.small a { color:#9aa2b8; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <img class="icon" src="../img/apps/three-realms.jpg" alt="삼국천하 아이콘" width="128" height="128">
+  <h1>삼국천하</h1>
+  <p class="sub">한중일 대전략 · 이순신 vs 조조 vs 노부나가</p>
+  <div class="btns">
+    <a class="cta" id="ios" href="https://apps.apple.com/kr/app/id6816171615" rel="noopener">App Store에서 받기</a>
+    <a class="cta alt" id="play" href="https://play.google.com/store/apps/details?id=com.syddstudio.threerealms" rel="noopener">Google Play에서 받기</a>
+  </div>
+  <p class="small">무료 · iPhone · Android<br><a href="/">SYDD Studio</a></p>
+</main>
+<script>
+try {
+  var L2 = storeLinks(location.search);
+  document.getElementById("ios").href = L2.ios;
+  document.getElementById("play").href = L2.play;
+} catch (e) {}
+</script>
+</body>
+</html>
