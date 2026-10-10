@@ -9,13 +9,37 @@
 // One-link for profiles (Instagram, YouTube): Android -> Play, iPhone/iPad -> App Store, else stay on this page.
 // ?s=<source> carries the channel into Play install referrer and App Store ct. No cookies, no trackers.
 var PLAY = "https://play.google.com/store/apps/details?id=com.syddstudio.threerealms";
-var APPSTORE = "https://apps.apple.com/kr/app/id6816171615";
+var APPSTORE_ID = "id6816171615";
+// Copy per language. Non-Korean versions never lead with Korean generals (marketing BANK §2: 한국 장수는 ko에서만 앞세운다).
+var I18N = {
+  ko: { cc: "kr", hl: "ko", title: "삼국천하", sub: "한중일 대전략 · 이순신 vs 조조 vs 노부나가", ios: "App Store에서 받기", play: "Google Play에서 받기", small: "무료 · iPhone · Android", alt: "삼국천하 아이콘", doc: "삼국천하 - 한중일 대전략 | SYDD Studio" },
+  ja: { cc: "jp", hl: "ja", title: "三国天下", sub: "日中韓の武将が集う大戦略 · 曹操 vs 織田信長", ios: "App Storeでダウンロード", play: "Google Playで入手", small: "無料 · iPhone · Android", alt: "三国天下 アイコン", doc: "三国天下 - 日中韓の大戦略 | SYDD Studio" },
+  "zh-Hant": { cc: "tw", hl: "zh-TW", title: "三國天下", sub: "中日韓名將爭霸大戰略 · 曹操 vs 織田信長", ios: "在 App Store 下載", play: "在 Google Play 取得", small: "免費 · iPhone · Android", alt: "三國天下 圖示", doc: "三國天下 - 中日韓大戰略 | SYDD Studio" },
+  en: { cc: "us", hl: "en", title: "Three Realms Heroes Collide", sub: "Cao Cao vs Oda Nobunaga · Free strategy game", ios: "Download on the App Store", play: "Get it on Google Play", small: "Free · iPhone · Android", alt: "Three Realms Heroes Collide icon", doc: "Three Realms Heroes Collide | SYDD Studio" }
+};
+// ?l=ja|zh-Hant|en|ko overrides; otherwise navigator.languages. Simplified Chinese and everything else -> en.
+function pickLang(search, langs) {
+  var m = /[?&]l=([^&#]*)/.exec(search || "");
+  if (m && I18N[m[1]]) return m[1];
+  for (var i = 0; i < (langs || []).length; i++) {
+    var l = String(langs[i]).toLowerCase();
+    if (l.indexOf("ko") === 0) return "ko";
+    if (l.indexOf("ja") === 0) return "ja";
+    if (l.indexOf("zh") === 0) return /hans|cn|sg/.test(l) ? "en" : "zh-Hant";
+    if (l.indexOf("en") === 0) return "en";
+  }
+  return "en";
+}
+var LANG = "ko";
+try { LANG = pickLang(location.search, navigator.languages || [navigator.language]); } catch (e) {}
+var T = I18N[LANG];
 function storeLinks(search) {
+  var APPSTORE = "https://apps.apple.com/" + T.cc + "/app/" + APPSTORE_ID;
   var m = /[?&]s=([^&#]*)/.exec(search || "");
   var s = m ? m[1].toLowerCase() : "";
   if (!/^[a-z0-9_-]{1,32}$/.test(s)) s = "";
   return {
-    play: s ? PLAY + "&referrer=" + encodeURIComponent("utm_source=" + s + "&utm_campaign=profile") : PLAY,
+    play: s ? PLAY + "&hl=" + T.hl + "&referrer=" + encodeURIComponent("utm_source=" + s + "&utm_campaign=profile") : PLAY + "&hl=" + T.hl,
     ios: s ? APPSTORE + "?ct=" + s : APPSTORE
   };
 }
@@ -57,20 +81,28 @@ h1 { font-family:"Galmuri11","Geist",sans-serif; font-weight:400; font-size:1.5r
 </head>
 <body>
 <main class="wrap">
-  <img class="icon" src="../img/apps/three-realms.jpg" alt="삼국천하 아이콘" width="128" height="128">
-  <h1>삼국천하</h1>
-  <p class="sub">한중일 대전략 · 이순신 vs 조조 vs 노부나가</p>
+  <img class="icon" id="icon" src="../img/apps/three-realms.jpg" alt="삼국천하 아이콘" width="128" height="128">
+  <h1 id="t">삼국천하</h1>
+  <p class="sub" id="sub">한중일 대전략 · 이순신 vs 조조 vs 노부나가</p>
   <div class="btns">
     <a class="cta" id="ios" href="https://apps.apple.com/kr/app/id6816171615" rel="noopener">App Store에서 받기</a>
     <a class="cta alt" id="play" href="https://play.google.com/store/apps/details?id=com.syddstudio.threerealms" rel="noopener">Google Play에서 받기</a>
   </div>
-  <p class="small">무료 · iPhone · Android<br><a href="/">SYDD Studio</a></p>
+  <p class="small" id="small">무료 · iPhone · Android<br><a href="/">SYDD Studio</a></p>
 </main>
 <script>
 try {
   var L2 = storeLinks(location.search);
   document.getElementById("ios").href = L2.ios;
   document.getElementById("play").href = L2.play;
+  document.documentElement.lang = T === I18N.en ? "en" : LANG === "zh-Hant" ? "zh-Hant" : LANG;
+  document.title = T.doc;
+  document.getElementById("t").textContent = T.title;
+  document.getElementById("sub").textContent = T.sub;
+  document.getElementById("ios").textContent = T.ios;
+  document.getElementById("play").textContent = T.play;
+  document.getElementById("small").firstChild.nodeValue = T.small;
+  document.getElementById("icon").alt = T.alt;
 } catch (e) {}
 </script>
 </body>
