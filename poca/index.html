@@ -14,32 +14,27 @@ var PLAY = "https://play.google.com/store/apps/details?id=com.syddstudio.casual.
 // ⚠ iOS is still in review (2026-10). Put "id6817077446" here once the App Store page is live —
 //   until then the App Store button is hidden and iPhones stay on this page.
 var APPSTORE_ID = "";
-// Fan vocabulary per language: ko 탑꾸·최애 / en bias·toploader / ja 推し·トレカ / zh-Hant 本命·小卡.
-// The app itself is Korean/English only; these strings only describe it.
+// Languages = the app's and the Play listing's (ko·en). Add one here only when the app ships it —
+// otherwise a visitor reads their language here and lands on an English store page and app.
+// Fan vocabulary: ko 최애·탑꾸 / en bias·toploader.
 var I18N = {
   ko: { hl: "ko", title: "포카 꾸미기", sub: "2D 스티커 말고 크림으로 3D 탑꾸. 진짜 크림·진주·큐빅으로 최애 포카를 꾸며요.", play: "Google Play에서 받기", ios: "App Store에서 받기", soon: "iPhone 버전은 곧 나와요", small: "무료 · Android · iPhone", alt: "포카 꾸미기 아이콘", doc: "포카 꾸미기 - 최애 탑꾸 포꾸 3D 데코 | SYDD Studio" },
-  en: { hl: "en", title: "Poca Craft", sub: "Kpop toploader deco for your bias. Pipe real cream, press pearls & gems in 3D.", play: "Get it on Google Play", ios: "Download on the App Store", soon: "iPhone version coming soon", small: "Free · Android · iPhone", alt: "Poca Craft icon", doc: "Poca Craft: Kpop Photocard DIY | SYDD Studio" },
-  ja: { hl: "ja", title: "Poca Craft", sub: "推しのトレカを3Dでデコ。クリーム・パール・ビジューで硬質ケースをかわいく。", play: "Google Playで入手", ios: "App Storeでダウンロード", soon: "iPhone版は近日公開", small: "無料 · Android · iPhone", alt: "Poca Craft アイコン", doc: "Poca Craft - 推しトレカの3Dデコ | SYDD Studio" },
-  "zh-Hant": { hl: "zh-TW", title: "Poca Craft", sub: "用奶油、珍珠、水鑽，3D 裝飾你的本命小卡。", play: "在 Google Play 取得", ios: "在 App Store 下載", soon: "iPhone 版即將推出", small: "免費 · Android · iPhone", alt: "Poca Craft 圖示", doc: "Poca Craft - 本命小卡 3D 裝飾 | SYDD Studio" },
-  es: { hl: "es", title: "Poca Craft", sub: "Decora la photocard de tu bias en 3D. Crema, perlas y gemas en tu toploader.", play: "Disponible en Google Play", ios: "Descárgalo en el App Store", soon: "Versión para iPhone muy pronto", small: "Gratis · Android · iPhone", alt: "Icono de Poca Craft", doc: "Poca Craft - Decora tu photocard en 3D | SYDD Studio" },
-  pt: { hl: "pt-BR", title: "Poca Craft", sub: "Decore o photocard do seu bias em 3D. Creme, pérolas e strass no seu toploader.", play: "Disponível no Google Play", ios: "Baixar na App Store", soon: "Versão para iPhone em breve", small: "Grátis · Android · iPhone", alt: "Ícone do Poca Craft", doc: "Poca Craft - Decore seu photocard em 3D | SYDD Studio" },
-  id: { hl: "id", title: "Poca Craft", sub: "Dekor photocard bias kamu dalam 3D. Krim, mutiara, dan permata di toploader.", play: "Dapatkan di Google Play", ios: "Download di App Store", soon: "Versi iPhone segera hadir", small: "Gratis · Android · iPhone", alt: "Ikon Poca Craft", doc: "Poca Craft - Dekor photocard 3D | SYDD Studio" },
-  th: { hl: "th", title: "Poca Craft", sub: "แต่งโฟโต้การ์ดเมนแบบ 3D ด้วยครีม ไข่มุก และเพชร บนท็อปโหลดเดอร์", play: "ดาวน์โหลดบน Google Play", ios: "ดาวน์โหลดบน App Store", soon: "เวอร์ชัน iPhone เร็วๆ นี้", small: "ฟรี · Android · iPhone", alt: "ไอคอน Poca Craft", doc: "Poca Craft - แต่งโฟโต้การ์ด 3D | SYDD Studio" }
+  en: { hl: "en", title: "Poca Craft", sub: "Kpop toploader deco for your bias. Pipe real cream, press pearls & gems in 3D.", play: "Get it on Google Play", ios: "Download on the App Store", soon: "iPhone version coming soon", small: "Free · Android · iPhone", alt: "Poca Craft icon", doc: "Poca Craft: Kpop Photocard DIY | SYDD Studio" }
 };
-// ?l= overrides; otherwise navigator.languages. Simplified Chinese and anything else -> en.
+// ?l=ko|en overrides; otherwise the first of navigator.languages that we have. Anything else -> en.
 function pickLang(search, langs) {
   var m = /[?&]l=([^&#]*)/.exec(search || "");
   if (m && I18N[m[1]]) return m[1];
   for (var i = 0; i < (langs || []).length; i++) {
-    var l = String(langs[i]).toLowerCase();
-    if (l.indexOf("zh") === 0) return /hans|cn|sg/.test(l) ? "en" : "zh-Hant";
-    var base = l.split(/[-_]/)[0];
+    var base = String(langs[i]).toLowerCase().split(/[-_]/)[0];
     if (I18N[base]) return base;
   }
-  return "en";
+  return "";
 }
-var LANG = "en";
-try { LANG = pickLang(location.search, navigator.languages || [navigator.language]); } catch (e) {}
+// MATCHED = the visitor's language is one we have. Only then pass hl= to Play — otherwise a Thai phone
+// would get Play's whole UI in English; without hl Play keeps the visitor's UI and shows our en listing anyway.
+var LANG = "en", MATCHED = false;
+try { var picked = pickLang(location.search, navigator.languages || [navigator.language]); if (picked) { LANG = picked; MATCHED = true; } } catch (e) {}
 var T = I18N[LANG];
 function param(search, k) {
   var m = new RegExp("[?&]" + k + "=([^&#]*)").exec(search || "");
@@ -49,9 +44,9 @@ function param(search, k) {
 function storeLinks(search) {
   var s = param(search, "s"), c = param(search, "c");
   var ref = s ? "utm_source=" + s + (c ? "&utm_campaign=" + c : "") : "";
-  // No storefront code: apps.apple.com/app/<id> opens the visitor's own country store (fans are in many countries).
+  // No storefront code: apps.apple.com/app/<id> opens the visitor's own country store (English-page visitors are in many countries).
   var ios = APPSTORE_ID ? "https://apps.apple.com/app/" + APPSTORE_ID + (s ? "?ct=" + s : "") : "";
-  return { play: PLAY + "&hl=" + T.hl + (ref ? "&referrer=" + encodeURIComponent(ref) : ""), ios: ios };
+  return { play: PLAY + (MATCHED ? "&hl=" + T.hl : "") + (ref ? "&referrer=" + encodeURIComponent(ref) : ""), ios: ios };
 }
 function pickStore(ua, touchPoints) {
   if (/Android/i.test(ua)) return "play";
@@ -79,13 +74,13 @@ try {
 @font-face { font-family:"Geist"; src:url("/fonts/Geist-Variable.woff2") format("woff2"); font-weight:100 900; font-display:swap; }
 * { box-sizing:border-box; }
 /* Palette = app tokens (pocacraft index.html :root) */
-body { margin:0; min-height:100vh; background:linear-gradient(180deg,#FBF3F5 0%,#F7DCE6 100%); color:#2F2529; font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Noto Sans KR","Hiragino Sans","PingFang TC","Noto Sans Thai",sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; }
+body { margin:0; min-height:100vh; background:linear-gradient(180deg,#FBF3F5 0%,#F7DCE6 100%); color:#2F2529; font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; }
 a { color:#B83A6C; text-decoration:none; }
 .wrap { max-width:440px; margin:0 auto; padding:48px 18px 40px; text-align:center; }
 .icon { width:120px; height:120px; border-radius:27px; box-shadow:0 10px 32px rgba(184,58,108,0.22); }
 h1 { font-size:1.7rem; font-weight:700; line-height:1.3; margin:22px 0 8px; letter-spacing:-0.01em; }
 .sub { color:#6E6168; margin:0 auto; max-width:360px; }
-:lang(ko) .sub { word-break:keep-all; } /* ko만 — ja·zh는 띄어쓰기가 없어 keep-all이면 줄이 안 바뀐다 */
+:lang(ko) .sub { word-break:keep-all; } /* ko만 — 띄어쓰기 없는 언어(ja·zh)를 더하면 keep-all이면 줄이 안 바뀐다 */
 .hero { display:block; width:100%; height:auto; max-width:440px; margin:28px auto 0; border-radius:20px; box-shadow:0 12px 40px rgba(184,58,108,0.16); }
 .btns { display:flex; flex-direction:column; gap:12px; margin:28px 0 0; }
 .cta { display:block; padding:14px 20px; border-radius:999px; background:#E0588C; color:#fff; font-weight:600; }
