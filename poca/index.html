@@ -11,9 +11,9 @@
 // ?s=<source>&c=<campaign> go into the Play install referrer (PostHog install_source/campaign) and App Store ct.
 // ?l=<lang> forces a language. No cookies, no trackers.
 var PLAY = "https://play.google.com/store/apps/details?id=com.syddstudio.casual.pocacraft";
-// ⚠ iOS is still in review (2026-10). Put "id6817077446" here once the App Store page is live —
-//   until then the App Store button is hidden and iPhones stay on this page.
-var APPSTORE_ID = "";
+// Set ahead of App Store approval (2026-10-10, user call): the one-link only goes public once iOS is live anyway.
+//   Empty this again to hide the App Store button and show "coming soon" instead.
+var APPSTORE_ID = "id6817077446";
 // Languages = the app's and the Play listing's (ko·en). Add one here only when the app ships it —
 // otherwise a visitor reads their language here and lands on an English store page and app.
 // Fan vocabulary: ko 최애·탑꾸 / en bias·toploader.
@@ -100,8 +100,8 @@ h1 { font-size:1.7rem; font-weight:700; line-height:1.3; margin:22px 0 8px; lett
   <img class="hero" src="/img/apps/pocacraft-hero.jpg" alt="" width="880" height="810">
   <div class="btns">
     <a class="cta" id="play" href="https://play.google.com/store/apps/details?id=com.syddstudio.casual.pocacraft" rel="noopener">Google Play에서 받기</a>
-    <a class="cta alt" id="ios" href="#" rel="noopener" hidden>App Store에서 받기</a>
-    <p class="soon" id="soon">iPhone 버전은 곧 나와요</p>
+    <a class="cta alt" id="ios" href="https://apps.apple.com/app/id6817077446" rel="noopener">App Store에서 받기</a>
+    <p class="soon" id="soon" hidden>iPhone 버전은 곧 나와요</p>
   </div>
   <p class="small" id="small">무료 · Android · iPhone<br><a href="/">SYDD Studio</a></p>
 </main>
