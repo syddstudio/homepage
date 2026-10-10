@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>포카 꾸미기 Poca Craft | SYDD Studio</title>
+<meta name="robots" content="noindex">
+<script>
+// One-link fallback for Poca Craft (onelink.to/ezmvvz "fallback" + profile links).
+// Android -> Play, iPhone/iPad -> App Store (once live), everything else stays on this page.
+// ?s=<source>&c=<campaign> go into the Play install referrer (PostHog install_source/campaign) and App Store ct.
+// ?l=<lang> forces a language. No cookies, no trackers.
+var PLAY = "https://play.google.com/store/apps/details?id=com.syddstudio.casual.pocacraft";
+// ⚠ iOS is still in review (2026-10). Put "id6817077446" here once the App Store page is live —
+//   until then the App Store button is hidden and iPhones stay on this page.
+var APPSTORE_ID = "";
+// Fan vocabulary per language: ko 탑꾸·최애 / en bias·toploader / ja 推し·トレカ / zh-Hant 本命·小卡.
+// The app itself is Korean/English only; these strings only describe it.
+var I18N = {
+  ko: { hl: "ko", title: "포카 꾸미기", sub: "2D 스티커 말고 크림으로 3D 탑꾸. 진짜 크림·진주·큐빅으로 최애 포카를 꾸며요.", play: "Google Play에서 받기", ios: "App Store에서 받기", soon: "iPhone 버전은 곧 나와요", small: "무료 · Android · iPhone", alt: "포카 꾸미기 아이콘", doc: "포카 꾸미기 - 최애 탑꾸 포꾸 3D 데코 | SYDD Studio" },
+  en: { hl: "en", title: "Poca Craft", sub: "Kpop toploader deco for your bias. Pipe real cream, press pearls & gems in 3D.", play: "Get it on Google Play", ios: "Download on the App Store", soon: "iPhone version coming soon", small: "Free · Android · iPhone", alt: "Poca Craft icon", doc: "Poca Craft: Kpop Photocard DIY | SYDD Studio" },
+  ja: { hl: "ja", title: "Poca Craft", sub: "推しのトレカを3Dでデコ。クリーム・パール・ビジューで硬質ケースをかわいく。", play: "Google Playで入手", ios: "App Storeでダウンロード", soon: "iPhone版は近日公開", small: "無料 · Android · iPhone", alt: "Poca Craft アイコン", doc: "Poca Craft - 推しトレカの3Dデコ | SYDD Studio" },
+  "zh-Hant": { hl: "zh-TW", title: "Poca Craft", sub: "用奶油、珍珠、水鑽，3D 裝飾你的本命小卡。", play: "在 Google Play 取得", ios: "在 App Store 下載", soon: "iPhone 版即將推出", small: "免費 · Android · iPhone", alt: "Poca Craft 圖示", doc: "Poca Craft - 本命小卡 3D 裝飾 | SYDD Studio" },
+  es: { hl: "es", title: "Poca Craft", sub: "Decora la photocard de tu bias en 3D. Crema, perlas y gemas en tu toploader.", play: "Disponible en Google Play", ios: "Descárgalo en el App Store", soon: "Versión para iPhone muy pronto", small: "Gratis · Android · iPhone", alt: "Icono de Poca Craft", doc: "Poca Craft - Decora tu photocard en 3D | SYDD Studio" },
+  pt: { hl: "pt-BR", title: "Poca Craft", sub: "Decore o photocard do seu bias em 3D. Creme, pérolas e strass no seu toploader.", play: "Disponível no Google Play", ios: "Baixar na App Store", soon: "Versão para iPhone em breve", small: "Grátis · Android · iPhone", alt: "Ícone do Poca Craft", doc: "Poca Craft - Decore seu photocard em 3D | SYDD Studio" },
+  id: { hl: "id", title: "Poca Craft", sub: "Dekor photocard bias kamu dalam 3D. Krim, mutiara, dan permata di toploader.", play: "Dapatkan di Google Play", ios: "Download di App Store", soon: "Versi iPhone segera hadir", small: "Gratis · Android · iPhone", alt: "Ikon Poca Craft", doc: "Poca Craft - Dekor photocard 3D | SYDD Studio" },
+  th: { hl: "th", title: "Poca Craft", sub: "แต่งโฟโต้การ์ดเมนแบบ 3D ด้วยครีม ไข่มุก และเพชร บนท็อปโหลดเดอร์", play: "ดาวน์โหลดบน Google Play", ios: "ดาวน์โหลดบน App Store", soon: "เวอร์ชัน iPhone เร็วๆ นี้", small: "ฟรี · Android · iPhone", alt: "ไอคอน Poca Craft", doc: "Poca Craft - แต่งโฟโต้การ์ด 3D | SYDD Studio" }
+};
+// ?l= overrides; otherwise navigator.languages. Simplified Chinese and anything else -> en.
+function pickLang(search, langs) {
+  var m = /[?&]l=([^&#]*)/.exec(search || "");
+  if (m && I18N[m[1]]) return m[1];
+  for (var i = 0; i < (langs || []).length; i++) {
+    var l = String(langs[i]).toLowerCase();
+    if (l.indexOf("zh") === 0) return /hans|cn|sg/.test(l) ? "en" : "zh-Hant";
+    var base = l.split(/[-_]/)[0];
+    if (I18N[base]) return base;
+  }
+  return "en";
+}
+var LANG = "en";
+try { LANG = pickLang(location.search, navigator.languages || [navigator.language]); } catch (e) {}
+var T = I18N[LANG];
+function param(search, k) {
+  var m = new RegExp("[?&]" + k + "=([^&#]*)").exec(search || "");
+  var v = m ? m[1].toLowerCase() : "";
+  return /^[a-z0-9_-]{1,32}$/.test(v) ? v : "";
+}
+function storeLinks(search) {
+  var s = param(search, "s"), c = param(search, "c");
+  var ref = s ? "utm_source=" + s + (c ? "&utm_campaign=" + c : "") : "";
+  // No storefront code: apps.apple.com/app/<id> opens the visitor's own country store (fans are in many countries).
+  var ios = APPSTORE_ID ? "https://apps.apple.com/app/" + APPSTORE_ID + (s ? "?ct=" + s : "") : "";
+  return { play: PLAY + "&hl=" + T.hl + (ref ? "&referrer=" + encodeURIComponent(ref) : ""), ios: ios };
+}
+function pickStore(ua, touchPoints) {
+  if (/Android/i.test(ua)) return "play";
+  if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1)) return "ios";
+  return "";
+}
+try {
+  var L = storeLinks(location.search);
+  var P = pickStore(navigator.userAgent || "", navigator.maxTouchPoints || 0);
+  if (P && L[P]) location.replace(L[P]);
+} catch (e) {}
+</script>
+<!-- Crawlers (KakaoTalk, X, Facebook link previews) don't run JS: one bilingual card for everyone. -->
+<meta name="description" content="2D 스티커 말고 크림으로 3D 탑꾸 · Kpop photocard deco in 3D — pipe real cream, press pearls &amp; gems. Free.">
+<meta property="og:title" content="포카 꾸미기 · Poca Craft">
+<meta property="og:description" content="크림·진주·큐빅으로 최애 포카 3D 탑꾸 · Kpop toploader deco for your bias. Free.">
+<meta property="og:url" content="https://syddstudio.com/poca/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://syddstudio.com/img/apps/pocacraft-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<style>
+@font-face { font-family:"Geist"; src:url("/fonts/Geist-Variable.woff2") format("woff2"); font-weight:100 900; font-display:swap; }
+* { box-sizing:border-box; }
+/* Palette = app tokens (pocacraft index.html :root) */
+body { margin:0; min-height:100vh; background:linear-gradient(180deg,#FBF3F5 0%,#F7DCE6 100%); color:#2F2529; font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Noto Sans KR","Hiragino Sans","PingFang TC","Noto Sans Thai",sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; }
+a { color:#B83A6C; text-decoration:none; }
+.wrap { max-width:440px; margin:0 auto; padding:48px 18px 40px; text-align:center; }
+.icon { width:120px; height:120px; border-radius:27px; box-shadow:0 10px 32px rgba(184,58,108,0.22); }
+h1 { font-size:1.7rem; font-weight:700; line-height:1.3; margin:22px 0 8px; letter-spacing:-0.01em; }
+.sub { color:#6E6168; margin:0 auto; max-width:360px; }
+:lang(ko) .sub { word-break:keep-all; } /* ko만 — ja·zh는 띄어쓰기가 없어 keep-all이면 줄이 안 바뀐다 */
+.hero { display:block; width:100%; height:auto; max-width:440px; margin:28px auto 0; border-radius:20px; box-shadow:0 12px 40px rgba(184,58,108,0.16); }
+.btns { display:flex; flex-direction:column; gap:12px; margin:28px 0 0; }
+.cta { display:block; padding:14px 20px; border-radius:999px; background:#E0588C; color:#fff; font-weight:600; }
+.cta.alt { background:#fff; color:#B83A6C; border:1.5px solid #E0588C; }
+.cta:hover { opacity:0.9; }
+.soon { color:#6E6168; font-size:0.9rem; margin:2px 0 0; }
+.small { color:#6E6168; font-size:0.82rem; margin-top:36px; }
+.small a { color:#6E6168; text-decoration:underline; }
+[hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <img class="icon" id="icon" src="/img/apps/pocacraft.png" alt="포카 꾸미기 아이콘" width="120" height="120">
+  <h1 id="t">포카 꾸미기</h1>
+  <p class="sub" id="sub">2D 스티커 말고 크림으로 3D 탑꾸. 진짜 크림·진주·큐빅으로 최애 포카를 꾸며요.</p>
+  <img class="hero" src="/img/apps/pocacraft-hero.jpg" alt="" width="880" height="810">
+  <div class="btns">
+    <a class="cta" id="play" href="https://play.google.com/store/apps/details?id=com.syddstudio.casual.pocacraft" rel="noopener">Google Play에서 받기</a>
+    <a class="cta alt" id="ios" href="#" rel="noopener" hidden>App Store에서 받기</a>
+    <p class="soon" id="soon">iPhone 버전은 곧 나와요</p>
+  </div>
+  <p class="small" id="small">무료 · Android · iPhone<br><a href="/">SYDD Studio</a></p>
+</main>
+<script>
+try {
+  var L2 = storeLinks(location.search);
+  document.getElementById("play").href = L2.play;
+  if (L2.ios) {
+    document.getElementById("ios").href = L2.ios;
+    document.getElementById("ios").hidden = false;
+    document.getElementById("soon").hidden = true;
+  }
+  document.documentElement.lang = LANG;
+  document.title = T.doc;
+  document.getElementById("t").textContent = T.title;
+  document.getElementById("sub").textContent = T.sub;
+  document.getElementById("play").textContent = T.play;
+  document.getElementById("ios").textContent = T.ios;
+  document.getElementById("soon").textContent = T.soon;
+  document.getElementById("small").firstChild.nodeValue = T.small;
+  document.getElementById("icon").alt = T.alt;
+} catch (e) {}
+</script>
+</body>
+</html>
