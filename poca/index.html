@@ -14,14 +14,16 @@ var PLAY = "https://play.google.com/store/apps/details?id=com.syddstudio.casual.
 // Set ahead of App Store approval (2026-10-10, user call): the one-link only goes public once iOS is live anyway.
 //   Empty this again to hide the App Store button and show "coming soon" instead.
 var APPSTORE_ID = "id6817077446";
-// Languages = the app's and the Play listing's (ko·en). Add one here only when the app ships it —
+// Languages = the app's and the store listings' (ko·en·pt·ja — pt·ja since 1.0.3, 2026-10-25). Add one here only when the app ships it —
 // otherwise a visitor reads their language here and lands on an English store page and app.
-// Fan vocabulary: ko 최애·탑꾸 / en bias·toploader.
+// Fan vocabulary: ko 최애·탑꾸 / en·pt bias·toploader / ja 推し·トレカ (store title トレカデコ — no K-pop wording, anime fans too).
 var I18N = {
   ko: { hl: "ko", title: "포카 꾸미기", sub: "2D 스티커 말고 크림으로 3D 탑꾸. 진짜 크림·진주·큐빅으로 최애 포카를 꾸며요.", play: "Google Play에서 받기", ios: "App Store에서 받기", soon: "iPhone 버전은 곧 나와요", small: "무료 · Android · iPhone", alt: "포카 꾸미기 아이콘", doc: "포카 꾸미기 - 최애 탑꾸 포꾸 3D 데코 | SYDD Studio" },
-  en: { hl: "en", title: "Poca Craft", sub: "Kpop toploader deco for your bias. Pipe real cream, press pearls & gems in 3D.", play: "Get it on Google Play", ios: "Download on the App Store", soon: "iPhone version coming soon", small: "Free · Android · iPhone", alt: "Poca Craft icon", doc: "Poca Craft: Kpop Photocard DIY | SYDD Studio" }
+  en: { hl: "en", title: "Poca Craft", sub: "Kpop toploader deco for your bias. Pipe real cream, press pearls & gems in 3D.", play: "Get it on Google Play", ios: "Download on the App Store", soon: "iPhone version coming soon", small: "Free · Android · iPhone", alt: "Poca Craft icon", doc: "Poca Craft: Kpop Photocard DIY | SYDD Studio" },
+  pt: { hl: "pt-BR", title: "Poca Craft", sub: "Toploader deco kpop para o seu bias: creme de verdade, pérolas e strass em 3D.", play: "Disponível no Google Play", ios: "Baixar na App Store", soon: "Versão para iPhone em breve", small: "Grátis · Android · iPhone", alt: "Ícone do Poca Craft", doc: "Poca Craft: Decorar Photocard | SYDD Studio" },
+  ja: { hl: "ja", title: "トレカデコ", sub: "シールじゃなく、クリームを絞る。パール・ストーン・パーツで推しのトレカを立体デコ。", play: "Google Play で手に入れよう", ios: "App Store からダウンロード", soon: "iPhone版はまもなく公開", small: "無料 · Android · iPhone", alt: "トレカデコのアイコン", doc: "トレカデコ：推しの硬質ケースデコ3D | SYDD Studio" }
 };
-// ?l=ko|en overrides; otherwise the first of navigator.languages that we have. Anything else -> en.
+// ?l=ko|en|pt|ja overrides; otherwise the first of navigator.languages that we have. Anything else -> en.
 function pickLang(search, langs) {
   var m = /[?&]l=([^&#]*)/.exec(search || "");
   if (m && I18N[m[1]]) return m[1];
@@ -80,7 +82,10 @@ a { color:#B83A6C; text-decoration:none; }
 .icon { width:120px; height:120px; border-radius:27px; box-shadow:0 10px 32px rgba(184,58,108,0.22); }
 h1 { font-size:1.7rem; font-weight:700; line-height:1.3; margin:22px 0 8px; letter-spacing:-0.01em; }
 .sub { color:#6E6168; margin:0 auto; max-width:360px; }
-:lang(ko) .sub { word-break:keep-all; } /* ko만 — 띄어쓰기 없는 언어(ja·zh)를 더하면 keep-all이면 줄이 안 바뀐다 */
+:lang(ko) .sub { word-break:keep-all; }
+/* ja — Apple SD Gothic Neo가 앞이면 가나가 한국 글꼴 모양으로 나온다(앱 index.html과 같은 함정) */
+:lang(ja) body { font-family:"Geist",-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif; } /* ko만 — 띄어쓰기 없는 언어(ja·zh)를 더하면 keep-all이면 줄이 안 바뀐다 */
+:lang(ja) .sub { word-break:auto-phrase; } /* 구절 단위 줄바꿈(Chrome) — 없으면 «スト/ーン»처럼 낱말 중간에서 끊겼다 */
 .hero { display:block; width:100%; height:auto; max-width:440px; margin:28px auto 0; border-radius:20px; box-shadow:0 12px 40px rgba(184,58,108,0.16); }
 .btns { display:flex; flex-direction:column; gap:12px; margin:28px 0 0; }
 .cta { display:block; padding:14px 20px; border-radius:999px; background:#E0588C; color:#fff; font-weight:600; }
